@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'translationhandler',
     'classroomhandler',
     'conversationhandler',
+    'charthandler',
 ]
 
 MIDDLEWARE = [

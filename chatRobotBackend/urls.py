@@ -27,7 +27,8 @@ urlpatterns = [
     path('teacherhandler/',include('teacherhandler.urls')),
     path('translationhandler/',include('translationhandler.urls')),
     path('qrcodehandler/',include('qrcodehandler.urls')),
-    path('conversationhandler/',include('conversationhandler.urls'))
+    path('conversationhandler/',include('conversationhandler.urls')),
+    path('charthandler/',include('charthandler.urls')),
 ]
 
 # only in development
