@@ -6,7 +6,6 @@ class TeacherUser(models.Model):
     phone_number = models.CharField(max_length=15, unique=True)
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)
-    password = models.CharField(max_length=128)  
-
+    password = models.CharField(max_length=128)
     def __str__(self):
         return self.username

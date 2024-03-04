@@ -25,7 +25,6 @@ def studentLogin(request):
             username = data.get('inputValue_stu_phone', '')
             password = data.get('inputValue_stu_pwd', '')
             student_user = StudentUser.objects.get(username=username)
-            print("student_user:",student_user.password)
             if password == student_user.password:
                 student_id = student_user.student_id
                 return JsonResponse({'message': 'Login successful','username':username,'student_id':student_id})

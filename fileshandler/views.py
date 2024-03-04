@@ -1,5 +1,9 @@
 import os
 import uuid
+import pandas as pd
+import pdfplumber
+import tabula
+from tabula import read_pdf
 from urllib.parse import unquote
 from fpdf import FPDF
 from openpyxl.reader.excel import load_workbook
@@ -106,6 +110,19 @@ def convert_excel_to_pdf(excel_path):
     pdf.save()
     return pdf_path
 
+def convert_pdf_to_excel(pdf_path):
+    # 创建EXCEL文件
+    pdf = pdfplumber.open(pdf_path)
+    first_page = pdf.pages[0]
+    table = first_page.extract_table()
+    excel_path = os.path.splitext(pdf_path)[0] + '.xlsx'
+    # 将列表转为df
+    table_df = pd.DataFrame(table[1:], columns=table[0])
+
+    # 保存excel
+    table_df.to_excel(excel_path)
+    return excel_path
+
 
 @csrf_exempt
 def excel2pdf(request):
@@ -129,6 +146,24 @@ def excel2pdf(request):
         file_url = request.build_absolute_uri(settings.MEDIA_URL + pdf_file_name)
         return HttpResponse(unquote(pdf_url), upload_file, status=200)
 
-
+@csrf_exempt
 def pdf2excel(request):
-    return None
+    if request.method != 'POST':
+        print("不是post方法")
+    else:
+        upload_file = request.FILES.get('file_pdf2excel')
+        # 生成一个唯一个文件名
+        file_name = str(uuid.uuid4()) + '.pdf'
+        pdf_file_name = file_name.split('.')[0] + '.xlsx'
+        # 保存文件到服务器的某个位置
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        fs = FileSystemStorage()
+        fs.save(file_path, upload_file)
+        # 生成对应的pdf文件
+        excel_file_path = convert_pdf_to_excel(file_path)
+
+        # 生成对应的pdf文件的url
+        excel_url = request.build_absolute_uri(settings.MEDIA_URL + excel_file_path)
+        # 构建url
+        file_url = request.build_absolute_uri(settings.MEDIA_URL + pdf_file_name)
+        return HttpResponse(unquote(excel_url), upload_file, status=200)

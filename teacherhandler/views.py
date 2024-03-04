@@ -1,8 +1,5 @@
 import json
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -12,7 +9,6 @@ from teacherhandler.models import TeacherUser
 from teacherhandler.serializers import TeacherUserSerializer
 
 
-# Create your views here.
 def teacherRobot(request):
     pass
 
@@ -23,8 +19,6 @@ def teadentLogin(request):
             data = json.loads(request.body)
             username = data.get('inputValue_teacher_username', '')
             password = data.get('inputValue_teacher_pwd', '')
-            print(username)
-            print(password)
             teacher_user = TeacherUser.objects.get(username=username)
             if password == teacher_user.password:
                 teacher_id = teacher_user.teacher_id
