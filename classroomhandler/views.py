@@ -3,6 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from studenthandler.models import StudentUser
 from teacherhandler.models import TeacherUser
 from .models import RobotClassRoom
 from .serializers import RobotClassRoomSerializer
@@ -27,6 +29,44 @@ def create_class(request):
        return JsonResponse(serializer.data,status=status.HTTP_201_CREATED)
     else:
        return JsonResponse({'error': 'Only POST requests are allowed'}, status=400)
+
+# 老师加入班级
+@csrf_exempt
+@api_view(['POST'])
+def teacher_participate_class(request):
+    if request.method == 'POST':
+        teacher_id = request.POST.get('teacher_id')
+        class_name = request.POST.get('class_name')
+        # 根据班级名称获取班级对象
+        classroom = RobotClassRoom.objects.get(class_name=class_name)
+        # 获取老师对象
+        teacher = TeacherUser.objects.get(teacher_id = teacher_id)
+        classroom.teacher.add(teacher)
+        # 序列化
+        serializer = RobotClassRoomSerializer(classroom)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed'}, status=400)
+
+
+# 学生加入班级
+@csrf_exempt
+@api_view(['POST'])
+def student_participate_class(request):
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        class_name = request.POST.get('class_name')
+        # 根据班级名称获取班级对象
+        classroom = RobotClassRoom.objects.get(class_name=class_name)
+        # 获取学生对象
+        student = StudentUser.objects.get(student_id = student_id)
+        classroom.student.add(student)
+        # 序列化
+        serializer = RobotClassRoomSerializer(classroom)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed'}, status=400)
+
 @csrf_exempt
 @api_view(['PUT'])
 def edit_class(request, class_id):
@@ -63,3 +103,54 @@ def get_teacher_classrooms(request, teacher_id):
 
     except TeacherUser.DoesNotExist:
         return JsonResponse({'error': 'Teacher not found'}, status=404)
+
+
+@csrf_exempt
+@api_view(['GET'])
+def get_student_classrooms(request, student_id):
+    try:
+        student = StudentUser.objects.get(student_id=student_id)
+        classrooms = student.classrooms.all()
+        # 构造班级信息的字典列表
+        classrooms_info = []
+        for classroom in classrooms:
+            classrooms_info.append({
+                'class_id': classroom.class_id,
+                'class_name': classroom.class_name,
+                'class_avatar': classroom.class_avatar,
+                # 添加其他需要的字段
+            })
+        # 返回JSON响应
+        return JsonResponse({'classrooms': classrooms_info})
+
+    except StudentUser.DoesNotExist:
+        return JsonResponse({'error': 'Student not found'}, status=404)
+
+
+@csrf_exempt
+@api_view(['GET'])
+def get_users_in_classrooms(request, class_id):
+    try:
+        classroom = RobotClassRoom.objects.get(class_id=class_id)
+        # 获取与该班级编号关联的所有教师和学生
+        teachers = classroom.teacher.all()
+        students = classroom.student.all()
+        # 构造用户信息的字典列表
+        users_info = []
+        for teacher_user in teachers:
+            users_info.append({
+                'user_name': teacher_user.username,
+                'user_email': teacher_user.email,
+            })
+
+        for student_user in students:
+            users_info.append({
+                'user_name': student_user.username,
+                'user_email': student_user.email,
+            })
+
+        # 返回JSON响应
+        return JsonResponse({'users_info': users_info},status=status.HTTP_200_OK)
+
+    except RobotClassRoom.DoesNotExist:
+        return JsonResponse({'error': 'ClassRooms not found'}, status=404)

@@ -8,7 +8,7 @@ class RobotClassRoom(models.Model):
     class_name = models.CharField(max_length=255,unique=True)
     class_avatar = models.CharField(max_length=100,default='duck')
     teacher = models.ManyToManyField(TeacherUser, related_name='classrooms', blank=True)
-    students = models.ManyToManyField(StudentUser, related_name='classrooms', blank=True)
+    student = models.ManyToManyField(StudentUser, related_name='classrooms', blank=True)
 
     def __str__(self):
         return self.class_name
