@@ -10,6 +10,7 @@ urlpatterns = [
     path('teacher_participate/', views.teacher_participate_class, name='teacher_participate_class'),
     path('create_class/', views.create_class, name='create_class'),
     path('edit_class/<int:class_id>/', views.edit_class, name='edit_class'),
-    path('get_users_in_classrooms/<int:class_id>/', views.get_student_classrooms, name='get_student_classrooms'),
+    path('get_users_in_classrooms/<int:class_id>/', views.get_users_in_classrooms, name='get_student_classrooms'),
+    path('get_classroom_name_byId/<int:class_id>/',views.get_classroom_name_byId,name='get_classroom_name_byId'),
 
 ]

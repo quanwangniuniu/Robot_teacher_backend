@@ -154,3 +154,10 @@ def get_users_in_classrooms(request, class_id):
 
     except RobotClassRoom.DoesNotExist:
         return JsonResponse({'error': 'ClassRooms not found'}, status=404)
+
+
+@csrf_exempt
+@api_view(['GET'])
+def get_classroom_name_byId(request,class_id):
+    classroom = RobotClassRoom.objects.get(class_id=class_id)
+    return JsonResponse(classroom.class_name,status=200,safe=False)
