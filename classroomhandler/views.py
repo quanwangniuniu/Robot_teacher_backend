@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from studenthandler.models import StudentUser
 from teacherhandler.models import TeacherUser
-from .models import RobotClassRoom
+from .models import RobotClassRoom, ClassRoomMessage
 from .serializers import RobotClassRoomSerializer
 @csrf_exempt
 @api_view(['POST'])
@@ -161,3 +161,24 @@ def get_users_in_classrooms(request, class_id):
 def get_classroom_name_byId(request,class_id):
     classroom = RobotClassRoom.objects.get(class_id=class_id)
     return JsonResponse(classroom.class_name,status=200,safe=False)
+
+@csrf_exempt
+@api_view(['GET'])
+def get_classroom_messages(request,class_id):
+    try:
+        classroom_messages = ClassRoomMessage.objects.filter(class_id=class_id)
+        classroom_info = []
+        for message in classroom_messages:
+            info = {
+                'message_id': message.message_id,
+                'class_id':message.class_id,
+                'message_content':message.message_content,
+                'user_name':message.user_name,
+                'user_type':message.user_type,
+                'message_avatar':message.message_avatar
+            }
+            classroom_info.append(info)
+        # 返回包含当前班级所有信息的 JSON 响应
+        return JsonResponse({'classroom_info':classroom_info})
+    except ClassRoomMessage.DoesNotExist:
+        return JsonResponse({'classroom_info':[]})

@@ -12,3 +12,12 @@ class RobotClassRoom(models.Model):
 
     def __str__(self):
         return self.class_name
+
+
+class ClassRoomMessage(models.Model):
+    message_id = models.AutoField(primary_key=True)
+    class_id = models.IntegerField()
+    message_content = models.CharField(max_length=2000)
+    user_name = models.CharField(max_length=100,default='li')
+    user_type = models.CharField(max_length=20)
+    message_avatar = models.CharField(max_length=50)
