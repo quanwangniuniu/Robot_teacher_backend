@@ -3,7 +3,6 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 from studenthandler.models import StudentUser
 from teacherhandler.models import TeacherUser
 from .models import RobotClassRoom, ClassRoomMessage
@@ -182,3 +181,26 @@ def get_classroom_messages(request,class_id):
         return JsonResponse({'classroom_info':classroom_info})
     except ClassRoomMessage.DoesNotExist:
         return JsonResponse({'classroom_info':[]})
+
+@csrf_exempt
+@api_view(['POST'])
+def sendMessage(request,class_id,username):
+    data = request.body.decode('utf-8')
+    message = ClassRoomMessage()
+    message.class_id = class_id
+    message.user_name = username
+    def check_user_role(username):
+        is_student = StudentUser.objects.filter(username=username).exists()
+        is_teacher = TeacherUser.objects.filter(username=username).exists()
+        if is_student and not is_teacher:
+            return "student"
+        elif is_teacher and not is_student:
+            return "teacher"
+        else:
+            return "unknown"
+    message.user_type = check_user_role(username)
+
+    message.message_avatar = 'https://robohash.org/duck'
+    message.message_content = data
+    message.save()
+    return JsonResponse("success send message",status=status.HTTP_200_OK,safe=False)
