@@ -7,6 +7,14 @@ from studenthandler.models import StudentUser
 from teacherhandler.models import TeacherUser
 from .models import RobotClassRoom, ClassRoomMessage
 from .serializers import RobotClassRoomSerializer
+from conversationhandler.models import Message
+from aip import AipNlp
+
+APP_ID = '55095226'
+API_KEY = 'illTXbudO1jWmuXAad1NEPyo'
+SECRET_KEY = '6EogFbwnmNYH30H9MQpfIcUYZNbYtPWs'
+
+client = AipNlp(APP_ID,API_KEY,SECRET_KEY)
 @csrf_exempt
 @api_view(['POST'])
 def create_class(request):
@@ -204,3 +212,30 @@ def sendMessage(request,class_id,username):
     message.message_content = data
     message.save()
     return JsonResponse("success send message",status=status.HTTP_200_OK,safe=False)
+
+# 关键词和数据分析提取
+@csrf_exempt
+@api_view(['GET'])
+def substract_tags(request):
+    # 获取所有Message实例
+    all_messages = Message.objects.filter(message_type='right')
+
+    # 使用列表推导式提取message_content字段的值
+    message_contents_list = [message.message_content for message in all_messages]
+    # 打印列表长度
+    print("Length of message_contents_list:", len(message_contents_list))
+
+
+    for content in message_contents_list:
+        result = client.keyword('软件工程', content)
+        print("result:-------")
+        print(result)
+        print(content)
+
+        # 将列表转换为JSON响应格式
+    response_data = {
+        'message_contents': message_contents_list
+    }
+
+    # 返回JSON响应
+    return JsonResponse(response_data)

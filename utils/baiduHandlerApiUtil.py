@@ -68,6 +68,7 @@ def article_keyword():
     '''
     result = client.keyword(title,content)
     print(result)
+    return result
 
 # 地址识别
 def address_recognition():

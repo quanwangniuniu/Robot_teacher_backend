@@ -14,4 +14,5 @@ urlpatterns = [
     path('get_classroom_name_byId/<int:class_id>/',views.get_classroom_name_byId,name='get_classroom_name_byId'),
     path('get_classroom_messages/<int:class_id>',views.get_classroom_messages,name='get_classroom_messages'),
     path('send_messages/<int:class_id>/<str:username>',views.sendMessage,name='send_messages'),
+    path('substract_tags/',views.substract_tags,name='substract_tags'),
 ]
