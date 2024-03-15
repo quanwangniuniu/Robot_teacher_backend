@@ -1,4 +1,6 @@
 import json
+import re
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -53,6 +55,29 @@ def update_teacherUser_data(request,teacher_id):
         return Response("User information updated successfully!",status=status.HTTP_200_OK)
     else:
         return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+
+@csrf_exempt
+@api_view(['POST'])
+def update_teacherUser_avatar(request,teacher_id):
+    try:
+        teacher_user = TeacherUser.objects.get(teacher_id=teacher_id)
+        def extract_number_from_string(input_string):
+            # 使用正则表达式匹配数字部分
+            matches = re.findall(r'\d+', input_string)
+
+            # 提取匹配到的第一个数字
+            if matches:
+                number = matches[0]
+                return number
+            else:
+                return None
+        teacher_user.teacher_avatar = "https://api.dicebear.com/7.x/miniavs/svg?seed="+extract_number_from_string(str(request.data))
+        teacher_user.save()
+        return Response("User Avatar updated successfully!",status=status.HTTP_200_OK)
+
+    except TeacherUser.DoesNotExist:
+        return Response("User not found",status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['POST'])
 def teacherRegister(request):

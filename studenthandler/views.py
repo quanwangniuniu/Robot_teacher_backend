@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -60,6 +61,28 @@ def update_studentUser_data(request,student_id):
     else:
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+@csrf_exempt
+@api_view(['POST'])
+def update_studentUser_avatar(request,student_id):
+    try:
+        student_user = StudentUser.objects.get(student_id=student_id)
+        def extract_number_from_string(input_string):
+            # 使用正则表达式匹配数字部分
+            matches = re.findall(r'\d+', input_string)
+
+            # 提取匹配到的第一个数字
+            if matches:
+                number = matches[0]
+                return number
+            else:
+                return None
+        student_user.student_avatar = "https://api.dicebear.com/7.x/miniavs/svg?seed="+extract_number_from_string(str(request.data))
+        student_user.save()
+        return Response("User Avatar updated successfully!",status=status.HTTP_200_OK)
+
+    except StudentUser.DoesNotExist:
+        return Response("User not found",status=status.HTTP_404_NOT_FOUND)
+    
 @api_view(['POST'])
 def studentRegister(request):
     serializer = StudentUserSerializer(data=request.data)
