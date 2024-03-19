@@ -11,7 +11,8 @@ from administratorhandler.models import AdminUser
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-
+from classroomhandler.models import RobotClassRoom
+from classroomhandler.serializers import RobotClassRoomSerializer
 from teacherhandler.models import TeacherUser
 from teacherhandler.serializers import TeacherUserSerializer
 
@@ -118,6 +119,14 @@ def getAllMessages(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 @csrf_exempt
+@require_http_methods(["GET"])
+def getAllClasses(request):
+    classes = RobotClassRoom.objects.all()
+    serializer = RobotClassRoomSerializer(classes, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@csrf_exempt
 @require_http_methods(["PUT"])
 def edit_robot_by_id(request, conversation_id):
     # 获取要编辑的机器人对象
@@ -131,3 +140,31 @@ def edit_robot_by_id(request, conversation_id):
         return JsonResponse(serializer.data, status=200)
     else:
         return JsonResponse(serializer.errors, status=400)
+
+
+@csrf_exempt
+@require_http_methods(["PUT"])
+def edit_classroom_by_id(request, class_id):
+    # 获取要编辑的班级对象
+    classroom = get_object_or_404(RobotClassRoom, class_id=class_id)
+    # 从请求中获取新的班级信息
+    data = json.loads(request.body)
+    # 更新对话信息
+    serializer = RobotClassRoomSerializer(instance=classroom, data=data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=200)
+    else:
+        return JsonResponse(serializer.errors, status=400)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def add_class(request):
+    data = json.loads(request.body)
+    serializer = RobotClassRoomSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=201)  # 返回创建成功的班级信息，状态码为201
+    else:
+        return JsonResponse(serializer.errors, status=400)  # 返回错误信息，状态码为400
