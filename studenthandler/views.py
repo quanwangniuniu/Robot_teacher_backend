@@ -6,10 +6,13 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from conversationhandler.models import Conversation
+from conversationhandler.serializers import ConversationSerializer
 from studenthandler.models import StudentUser
 from studenthandler.serializers import StudentUserSerializer
 
@@ -90,3 +93,10 @@ def studentRegister(request):
         serializer.save()
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def getAllRobots(request,student_id):
+    robots = Conversation.objects.filter(user_type="student",user_id=student_id)
+    serializer = ConversationSerializer(robots, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
