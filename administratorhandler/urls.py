@@ -14,6 +14,7 @@ urlpatterns = [
     path('edit_class/<int:class_id>', views.edit_classroom_by_id, name='editClass'),
     path('add_teacher/',views.add_teacher,name='addTeacher'),
     path('add_class/',views.add_class,name='addClass'),
-
+    path('get_model_parameter/',views.getAllParameters,name="getAllParameters"),
+    path('edit_model_parameter/', views.edit_model_parameter, name='editModel'),
     # 添加其他URL配置
 ]

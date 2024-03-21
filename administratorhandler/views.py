@@ -3,11 +3,12 @@ from django.views.decorators.http import require_http_methods
 from rest_framework import status
 from rest_framework.decorators import api_view
 
+from administratorhandler.serializers import MeicyModelSerializer
 from conversationhandler.models import Conversation, Message
 from conversationhandler.serializers import ConversationSerializer
 from studenthandler.models import StudentUser
 from studenthandler.serializers import StudentUserSerializer
-from administratorhandler.models import AdminUser
+from administratorhandler.models import AdminUser, MeicyModel
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -168,3 +169,23 @@ def add_class(request):
         return JsonResponse(serializer.data, status=201)  # 返回创建成功的班级信息，状态码为201
     else:
         return JsonResponse(serializer.errors, status=400)  # 返回错误信息，状态码为400
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def getAllParameters(request):
+    model = MeicyModel.objects.all()
+    serializer = MeicyModelSerializer(model, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+@csrf_exempt
+@require_http_methods(["PUT"])
+def edit_model_parameter(request):
+    model = get_object_or_404(MeicyModel, model_id=1)
+    data = json.loads(request.body)
+    # 更新对话信息
+    serializer = MeicyModelSerializer(instance=model, data=data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=200)
+    else:
+        return JsonResponse(serializer.errors, status=400)
