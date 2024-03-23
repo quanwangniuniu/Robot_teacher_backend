@@ -12,6 +12,7 @@ class Conversation(models.Model):
     robot_model = models.CharField(max_length=100,default='qwen-max')
     robot_prompt =models.CharField(max_length=300,default='programing teacher')
     roles = models.CharField(max_length=200,default='programing teacher')
+    rate = models.FloatField(max_length=5,default=0)
 
 # 对话具体信息表
 class Message(models.Model):
