@@ -148,12 +148,14 @@ def get_users_in_classrooms(request, class_id):
             users_info.append({
                 'user_name': teacher_user.username,
                 'user_email': teacher_user.email,
+                'avatar':teacher_user.teacher_avatar,
             })
 
         for student_user in students:
             users_info.append({
                 'user_name': student_user.username,
                 'user_email': student_user.email,
+                'avatar':student_user.student_avatar,
             })
 
         # 返回JSON响应
@@ -207,8 +209,10 @@ def sendMessage(request,class_id,username):
         else:
             return "unknown"
     message.user_type = check_user_role(username)
-
-    message.message_avatar = 'https://robohash.org/duck'
+    if check_user_role(username)=='student':
+        message.message_avatar = StudentUser.objects.get(username=username).student_avatar
+    else:
+        message.message_avatar = TeacherUser.objects.get(username=username).teacher_avatar
     message.message_content = data
     message.save()
     return JsonResponse("success send message",status=status.HTTP_200_OK,safe=False)
@@ -222,15 +226,15 @@ def substract_tags(request):
 
     # 使用列表推导式提取message_content字段的值
     message_contents_list = [message.message_content for message in all_messages]
-    # 打印列表长度
-    print("Length of message_contents_list:", len(message_contents_list))
+    # # 打印列表长度
+    # print("Length of message_contents_list:", len(message_contents_list))
 
 
-    for content in message_contents_list:
-        result = client.keyword('软件工程', content)
-        print("result:-------")
-        print(result)
-        print(content)
+    # for content in message_contents_list:
+    #     result = client.keyword('软件工程', content)
+    #     print("result:-------")
+    #     print(result)
+    #     print(content)
 
         # 将列表转换为JSON响应格式
     response_data = {
@@ -239,3 +243,13 @@ def substract_tags(request):
 
     # 返回JSON响应
     return JsonResponse(response_data)
+
+@csrf_exempt
+@api_view(['GET'])
+def get_teacher_avatar(request,teacher_id):
+    return JsonResponse(TeacherUser.objects.get(teacher_id=teacher_id).teacher_avatar,status=200,safe=False)
+
+@csrf_exempt
+@api_view(['GET'])
+def get_student_avatar(request,student_id):
+    return JsonResponse(StudentUser.objects.get(student_id=student_id).student_avatar,status=200,safe=False)
