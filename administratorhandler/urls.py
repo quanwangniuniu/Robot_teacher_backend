@@ -16,5 +16,6 @@ urlpatterns = [
     path('add_class/',views.add_class,name='addClass'),
     path('get_model_parameter/',views.getAllParameters,name="getAllParameters"),
     path('edit_model_parameter/', views.edit_model_parameter, name='editModel'),
+    path('send_feedback/',views.send_feedback,name='sendFeedback'),
     # 添加其他URL配置
 ]

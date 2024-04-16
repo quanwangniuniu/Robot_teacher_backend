@@ -2,7 +2,7 @@ import json
 from django.views.decorators.http import require_http_methods
 from rest_framework import status
 from rest_framework.decorators import api_view
-
+from django.core.mail import send_mail
 from administratorhandler.serializers import MeicyModelSerializer
 from conversationhandler.models import Conversation, Message
 from conversationhandler.serializers import ConversationSerializer
@@ -189,3 +189,25 @@ def edit_model_parameter(request):
         return JsonResponse(serializer.data, status=200)
     else:
         return JsonResponse(serializer.errors, status=400)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def send_feedback(request):
+    data = json.loads(request.body)
+    name = data.get('name', '')
+    email = data.get('email', '')
+    message = data.get('message', '')
+
+    try:
+        if name and email and message:
+            # 发送邮件
+            send_mail(
+                'Feedback from {}'.format(name),
+                message,
+                email,
+                ['1606327882@qq.com'],  # 收件人邮箱
+                fail_silently=False,
+            )
+        return JsonResponse({'status':'success'},status=200)
+    except Exception as e:
+        return JsonResponse({'status':'error','message':str(e)},status=status.HTTP_401_UNAUTHORIZED)
