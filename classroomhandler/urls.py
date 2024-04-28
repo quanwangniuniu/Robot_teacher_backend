@@ -15,4 +15,6 @@ urlpatterns = [
     path('get_classroom_messages/<int:class_id>',views.get_classroom_messages,name='get_classroom_messages'),
     path('send_messages/<int:class_id>/<str:username>',views.sendMessage,name='send_messages'),
     path('substract_tags/',views.substract_tags,name='substract_tags'),
+    path('get_teacher_avatar/<int:teacher_id>/',views.get_teacher_avatar,name='get_teacher_avatar'),
+    path('get_student_avatar/<int:student_id>/',views.get_student_avatar,name='get_student_avatar'),
 ]
