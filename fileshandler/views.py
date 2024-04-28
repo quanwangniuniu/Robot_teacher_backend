@@ -2,8 +2,6 @@ import os
 import uuid
 import pandas as pd
 import pdfplumber
-import tabula
-from tabula import read_pdf
 from urllib.parse import unquote
 from fpdf import FPDF
 from openpyxl.reader.excel import load_workbook
@@ -27,7 +25,7 @@ def pdf2docx(request):
         upload_file = request.FILES.get('file_pdf2docx')
         # 生成一个唯一个文件名
         file_name = str(uuid.uuid4())+'.pdf'
-        # 保存文件到服务器的某个位置
+        # 保存文件到服务器
         file_path = os.path.join(settings.MEDIA_ROOT,file_name)
         fs = FileSystemStorage()
         # pdf2docxUtil.pdf2docxUtil(file_path)

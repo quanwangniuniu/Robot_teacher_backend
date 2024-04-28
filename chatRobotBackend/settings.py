@@ -82,9 +82,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'robot_schema',
         'USER': 'root',
-        'PASSWORD': '1111',
+        'PASSWORD': '123456',
         'HOST': 'localhost',
-        'PORT': '3306',
+        'PORT': '3396',
     }
 }
 
