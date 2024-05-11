@@ -1,7 +1,5 @@
 from django.http import JsonResponse
-from django.shortcuts import render
 import random
-import json
 from http import HTTPStatus
 from dashscope import Generation
 from django.views.decorators.csrf import csrf_exempt
@@ -11,7 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .models import Conversation,Message
 from .serializers import ConversationSerializer,MessageSerializer
-dashscope.api_key = "sk-ed6d4a77b7b343679f7860466e562247"
+dashscope.api_key = "sk-4647b9e72938435bb2d594e856c3a37c"
 
 @csrf_exempt
 def conversation_view(request,robot_id,robot_role):
@@ -26,7 +24,7 @@ def conversation_view(request,robot_id,robot_role):
             message.message_type = 'right' # 用户信息为right
             message.save()
             response = Generation.call(
-                'qwen-max',
+                'qwen-turbo',
                 messages=messages,
                 seed = random.randint(1,10000),
                 result_format = 'message',
